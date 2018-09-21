@@ -26,13 +26,13 @@
   ],
   "author": "Ethan Zhang",
   "license": "ISC",
-  "homepage": "",
+  "homepage": "https://github.com/nullcc/json-tokenizer",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/nullcc/json-tokenizer/issues"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/nullcc/json-tokenizer"
   },
   "dependencies": {
     "@types/es6-promise": "^3.3.0",

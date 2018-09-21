@@ -4,9 +4,9 @@ import { TokenType } from "./type";
 const EOF = 'EOF';
 
 export class TokenReader {
-  private data: string;
   public startIndex: number;
   public currentIndex: number;
+  private data: string;
 
   constructor() {
     this.data = null;
@@ -18,7 +18,7 @@ export class TokenReader {
    * Load JSON string to token reader.
    * @param data JSON string
    */
-  load(data: string) {
+  public load(data: string) {
     this.data = data;
   }
   
@@ -27,7 +27,7 @@ export class TokenReader {
    * Skip this character if condition is satisfied, or else throw error.
    * @param c 
    */
-  expect(c) {
+  public expect(c) {
     if (c && this.data[this.currentIndex] !== c) {
       throw new Error("Invalid JSON input.");
     } else {
@@ -39,7 +39,7 @@ export class TokenReader {
    * Return true if c is a space string literal, or else return false.
    * @param c
    */
-  isSpace(c): boolean {
+  public isSpace(c): boolean {
     return /\s/.test(c);
   }
 
@@ -47,7 +47,7 @@ export class TokenReader {
    * Return true if c is a 'null' string literal, or else return false.
    * @param c 
    */
-  isNull(c): boolean {
+  public isNull(c): boolean {
     if (c === "n") {
       this.expect("u");
       this.expect("l");
@@ -61,7 +61,7 @@ export class TokenReader {
    * Return true if c is a 'true' string literal, or else return false.
    * @param c 
    */
-  isTrue(c): boolean {
+  public isTrue(c): boolean {
     if (c === "t") {
       this.expect("r");
       this.expect("u");
@@ -75,7 +75,7 @@ export class TokenReader {
    * Return true if c is a 'false' string literal, or else return false.
    * @param c 
    */
-  isFalse(c): boolean {
+  public isFalse(c): boolean {
     if (c === "f") {
       this.expect("a");
       this.expect("l");
@@ -90,7 +90,7 @@ export class TokenReader {
    * Return true if c is a number string literal, or else return false.
    * @param c 
    */
-  isNum(c): boolean {
+  public isNum(c): boolean {
     return /[0-9]/.test(c) || c === "-";
   }
 
@@ -98,7 +98,7 @@ export class TokenReader {
    * Return true if c is a hex(0-9A-Fa-f) string literal, or else return false.
    * @param c 
    */
-  isHex(c): boolean {
+  public isHex(c): boolean {
     return /[0-9A-Fa-f]/.test(c);
   }
 
@@ -106,7 +106,7 @@ export class TokenReader {
    * Return true if c is a escape value string literal, or else return false.
    * @param c 
    */
-  isEscape(c): boolean {
+  public isEscape(c): boolean {
     if (c === "\\") {
       c = this.readForward();
       if (
@@ -133,7 +133,7 @@ export class TokenReader {
    * Return true if c is a 1-9 string literal, or else return false.
    * @param c 
    */
-  isDigitOne2Nine(c): boolean {
+  public isDigitOne2Nine(c): boolean {
     return /[1-9]/.test(c);
   }
 
@@ -141,7 +141,7 @@ export class TokenReader {
    * Return true if c is a 0-9 string literal, or else return false.
    * @param c 
    */
-  isDigit(c): boolean {
+  public isDigit(c): boolean {
     return /[0-9]/.test(c);
   }
 
@@ -149,14 +149,14 @@ export class TokenReader {
    * Return true if c is a 'e' or 'E' string literal, or else return false.
    * @param c 
    */
-  isExp(c): boolean {
+  public isExp(c): boolean {
     return c === "e" || c === "E";
   }
 
   /**
    * Read next character. Return 'EOF' if this.currentIndex is out of range of this.data.
    */
-  readForward(): string {
+  public readForward(): string {
     if (this.currentIndex < this.data.length) {
       const c = this.data[this.currentIndex];
       this.currentIndex += 1;
@@ -168,14 +168,14 @@ export class TokenReader {
   /**
    * Back forward a character.
    */
-  readBackward() {
+  public readBackward() {
     this.currentIndex -= 1;
   }
 
   /**
    * Try to read a string.
    */
-  readString() {
+  public readString() {
     let str = "";
     while (true) {
       let c = this.readForward();
@@ -195,6 +195,8 @@ export class TokenReader {
         }
       } else if (c === '"') { // end of string, return a token
         return new Token(TokenType.STRING, str);
+      } else if (c === EOF) { // throw error if reach EOF but have not finish reading string yet
+        throw new Error("Invalid JSON input.");
       } else { // collect character
         str += `${c}`;
       }
@@ -204,7 +206,7 @@ export class TokenReader {
   /**
    * Try to read a number.
    */
-  readNumber() {
+  public readNumber() {
     let str = "";
     let c = this.readForward();
     if (c === "-") { // may be a negative number
@@ -239,12 +241,12 @@ export class TokenReader {
     if (str.indexOf(".") !== -1) {
       num = parseFloat(str);
     } else {
-      num = parseInt(str);
+      num = parseInt(str, 10);
     }
     return new Token(TokenType.NUMBER, num);
   }
 
-  appendNumber(str) {
+  public appendNumber(str) {
     let c = this.readForward();
     if (c === ".") {
       str += `${c}`;
@@ -267,7 +269,7 @@ export class TokenReader {
    * Append decimal part to str.
    * @param str
    */
-  appendDecimalPart(str) {
+  public appendDecimalPart(str) {
     let c = this.readForward();
     do {
       str += `${c}`;
@@ -277,9 +279,9 @@ export class TokenReader {
     return str;
   }
 
-  appendExp(str) {
+  public appendExp(str) {
     let c = this.readForward();
-    let op = c;
+    const op = c;
     if (op !== "+" && op !== "-") {
       throw new Error("Invalid JSON input.");
     }
@@ -293,11 +295,11 @@ export class TokenReader {
     if (op === "-") {
       pow = -pow;
     }
-    let num = parseFloat(str) * Math.pow(10, parseInt(pow));
+    const num = parseFloat(str) * Math.pow(10, parseInt(pow, 10));
     return num.toString();
   }
 
-  readNextToken() {
+  public readNextToken() {
     let c: any = "";
     do { // skip spaces if doesn't meet a valid token
       c = this.readForward();

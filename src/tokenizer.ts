@@ -1,6 +1,6 @@
 import { TokenReader } from "./reader";
-import { TokenType } from "./type";
 import { Token } from "./token";
+import { TokenType } from "./type";
 
 export class Tokenizer {
   private tokens: Token[];
@@ -13,12 +13,13 @@ export class Tokenizer {
     this.tokenReader = new TokenReader();
   }
 
-  read(jsonStr: string) {
+  public read(jsonStr: string) {
     this.jsonStr = jsonStr;
   }
 
-  tokenize() {
+  public tokenize() {
     this.tokenReader.load(this.jsonStr);
+
     while (true) {
       const token = this.tokenReader.readNextToken();
       this.tokens.push(token);
@@ -28,7 +29,7 @@ export class Tokenizer {
     }
   }
 
-  getTokens(): Token[] {
+  public getTokens(): Token[] {
     return this.tokens;
   }
 }

@@ -115,9 +115,20 @@ describe("Test Tokenizer", () => {
     const tokens = tokenizer.getTokens();
   });
 
-  test('Test {"a: 1c}', async () => {
+  test('Test {"a: "abc"}', async () => {
     const fn = () => {
-      const jsonStr = '{"a": 1c}';
+      const jsonStr = '{"a: "abc"}';
+      const tokenizer = new Tokenizer();
+      tokenizer.read(jsonStr);
+      tokenizer.tokenize();
+      const tokens = tokenizer.getTokens();
+    }
+    expect(fn).toThrow(/Invalid JSON input./);
+  });
+
+  test('Test {"a": abc}', async () => {
+    const fn = () => {
+      const jsonStr = '{"a: abc}';
       const tokenizer = new Tokenizer();
       tokenizer.read(jsonStr);
       tokenizer.tokenize();
